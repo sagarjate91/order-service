@@ -1,5 +1,7 @@
 package com.training.order_service.controller;
 
+import com.training.order_service.common.TransactionRequest;
+import com.training.order_service.common.TransactionResponse;
 import com.training.order_service.entity.OrderEntity;
 import com.training.order_service.exception.NoDataFoundException;
 import com.training.order_service.service.OrderService;
@@ -17,8 +19,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> orderSave(@RequestBody OrderEntity orderEntity){
-        return ResponseEntity.ok(orderService.orderSave(orderEntity));
+    public ResponseEntity<TransactionResponse> orderSave(@RequestBody TransactionRequest transactionRequest){
+        return ResponseEntity.ok(orderService.orderSave(transactionRequest));
     }
 
     @GetMapping("/getOrder/{productName}")

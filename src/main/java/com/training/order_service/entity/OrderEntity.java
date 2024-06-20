@@ -22,5 +22,6 @@ public class OrderEntity {
     private String productName;
     private int quantity;
     private double price;
+    private Integer paymentId;
 
 }
