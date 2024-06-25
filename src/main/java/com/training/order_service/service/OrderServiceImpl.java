@@ -3,6 +3,7 @@ package com.training.order_service.service;
 import com.training.order_service.common.Payment;
 import com.training.order_service.common.TransactionRequest;
 import com.training.order_service.common.TransactionResponse;
+import com.training.order_service.dto.OrderEntityDto;
 import com.training.order_service.entity.OrderEntity;
 import com.training.order_service.exception.NoDataFoundException;
 import com.training.order_service.respository.OrderRepository;
@@ -27,9 +28,28 @@ public class OrderServiceImpl implements OrderService{
         transactionRequest.getPayment().setTransactionId(UUID.randomUUID().toString());
         Payment payment= restTemplate.postForObject("http://PAYMENT-SERVICE/payment/save",transactionRequest.getPayment(),
                 Payment.class);
-        transactionRequest.getOrderEntity().setPaymentId(payment.getPaymentId());
-        OrderEntity orderEntity= orderRepository.save(transactionRequest.getOrderEntity());
-        return TransactionResponse.builder().orderEntity(orderEntity).payment(payment).build();
+        transactionRequest.getOrderEntityDto().setPaymentId(payment.getPaymentId());
+
+        // DTO to Entity
+        OrderEntity orderEntityRequest=OrderEntity.builder()
+                .orderId(transactionRequest.getOrderEntityDto().getOrderId())
+                .price(transactionRequest.getOrderEntityDto().getPrice())
+                .paymentId(transactionRequest.getOrderEntityDto().getPaymentId())
+                .quantity(transactionRequest.getOrderEntityDto().getQuantity())
+                .productName(transactionRequest.getOrderEntityDto().getProductName())
+                .build();
+
+        OrderEntity orderEntityResponse= orderRepository.save(orderEntityRequest);
+
+        // Entity to DTO
+        OrderEntityDto orderEntityDto=OrderEntityDto.builder()
+                .orderId(orderEntityResponse.getOrderId())
+                .paymentId(orderEntityResponse.getPaymentId())
+                .price(orderEntityResponse.getPrice())
+                .productName(orderEntityResponse.getProductName())
+                .quantity(orderEntityResponse.getQuantity())
+                .build();
+        return TransactionResponse.builder().orderEntityDto(orderEntityDto).payment(payment).build();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.training.order_service.common;
 
-import com.training.order_service.entity.OrderEntity;
+import com.training.order_service.dto.OrderEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TransactionResponse {
 
-    private OrderEntity orderEntity;
+    private OrderEntityDto orderEntityDto;
     private Payment payment;
 }

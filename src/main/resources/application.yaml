@@ -1,6 +1,6 @@
 spring:
       application:
-                 name: order-service
+                 name: ORDER-SERVICE
       datasource:
              url: jdbc:mysql://localhost:3306/flipkart
              username: root
@@ -12,3 +12,12 @@ spring:
 
 server:
      port: 8081
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
