@@ -3,11 +3,14 @@ package com.training.order_service.service;
 import com.training.order_service.common.Payment;
 import com.training.order_service.common.TransactionRequest;
 import com.training.order_service.common.TransactionResponse;
+import com.training.order_service.constant.Constant;
 import com.training.order_service.dto.OrderEntityDto;
 import com.training.order_service.entity.OrderEntity;
 import com.training.order_service.exception.NoDataFoundException;
 import com.training.order_service.respository.OrderRepository;
 import lombok.AllArgsConstructor;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,33 +25,26 @@ public class OrderServiceImpl implements OrderService{
 
     private final RestTemplate restTemplate;
 
+    private final ModelMapper modelMapper;
+
+
     @Override
     public TransactionResponse orderSave(TransactionRequest transactionRequest) {
         // rest call to payment
         transactionRequest.getPayment().setTransactionId(UUID.randomUUID().toString());
-        Payment payment= restTemplate.postForObject("http://PAYMENT-SERVICE/payment/save",transactionRequest.getPayment(),
+        Payment payment= restTemplate.postForObject(Constant.PAYMENT_URL,
+                transactionRequest.getPayment(),
                 Payment.class);
         transactionRequest.getOrderEntityDto().setPaymentId(payment.getPaymentId());
 
         // DTO to Entity
-        OrderEntity orderEntityRequest=OrderEntity.builder()
-                .orderId(transactionRequest.getOrderEntityDto().getOrderId())
-                .price(transactionRequest.getOrderEntityDto().getPrice())
-                .paymentId(transactionRequest.getOrderEntityDto().getPaymentId())
-                .quantity(transactionRequest.getOrderEntityDto().getQuantity())
-                .productName(transactionRequest.getOrderEntityDto().getProductName())
-                .build();
 
+        OrderEntity orderEntityRequest=modelMapper.map(transactionRequest.getOrderEntityDto(),OrderEntity.class);
         OrderEntity orderEntityResponse= orderRepository.save(orderEntityRequest);
 
         // Entity to DTO
-        OrderEntityDto orderEntityDto=OrderEntityDto.builder()
-                .orderId(orderEntityResponse.getOrderId())
-                .paymentId(orderEntityResponse.getPaymentId())
-                .price(orderEntityResponse.getPrice())
-                .productName(orderEntityResponse.getProductName())
-                .quantity(orderEntityResponse.getQuantity())
-                .build();
+
+        OrderEntityDto orderEntityDto=modelMapper.map(orderEntityResponse,OrderEntityDto.class);
         return TransactionResponse.builder().orderEntityDto(orderEntityDto).payment(payment).build();
     }
 
