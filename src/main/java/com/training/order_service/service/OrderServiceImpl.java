@@ -32,7 +32,7 @@ public class OrderServiceImpl implements OrderService{
     @Autowired
     ModelMapper modelMapper;
 
-    @Value("${microservice.payment-service.endpoint: http://PAYMENT-SERVICE/payment/order/save}")
+    @Value("${microservice.payment-service.endpoint:0}")
     private String PAYMENT_URL;
 
 
